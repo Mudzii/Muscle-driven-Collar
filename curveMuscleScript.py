@@ -118,7 +118,6 @@ def ConnectKeepOut():
     
 # ================================ # 
 def JointSetup(prntGrp, nrCVs, curveCVList):
-    print "jtn setup"
     global NURB
     
     shapes = cmds.listRelatives(str(NURB)) 
@@ -147,10 +146,6 @@ def JointSetup(prntGrp, nrCVs, curveCVList):
         cmds.connectAttr(pocNode + ".result.position", tempGrp + ".translate")
         cmds.setAttr(pocNode + ".parameter", (offset * i))
 
-        
-
-    
-    
 
 # ======================================================================================= #
 # ======================================================================================= #
@@ -160,12 +155,15 @@ class DrivenNurb(QtWidgets.QMainWindow):
     # ================================ #
     def __init__(self):
         super(DrivenNurb, self).__init__()
+        
+        global windowName 
         windowName = 'DrivenNurb'
         
         # Delete if exists
         if cmds.window(windowName, exists=True):
-            cmds.deleteUI(windowName)
-            logger.debug('Deleted previous UI')
+            self.CloseWindow(windowName)
+            #cmds.deleteUI(windowName)
+            #logger.debug('Deleted previous UI')
         else:
             logger.debug('No previous UI exists')
             pass
@@ -181,36 +179,43 @@ class DrivenNurb(QtWidgets.QMainWindow):
 
         self.BuildUI()
         
+    # ================================ #  
+    def CloseWindow(self, windowName):
+        cmds.deleteUI(windowName)
+        logger.debug('Deleted previous UI')
+                       
     # ================================ #   
     def BuildUI(self):
-        #Main widget
+        
+        # Main widget
         widget = QtWidgets.QWidget(self)
         self.setCentralWidget(widget)
         
-        ##Layout
+        # Layout
         lot = QtWidgets.QGridLayout()
-        
         widget.setLayout(lot)
         
         # collision mesh viewer
+        global col_mesh_view
         col_mesh_view = self.currentDirTxt = QtWidgets.QLineEdit()
         col_mesh_view.setStyleSheet("border: 1px groove black; border-radius: 4px;")
         col_mesh_view.returnPressed.connect(lambda: self.LoadMesh(col_mesh_view.text()))
         lot.addWidget(self.currentDirTxt,0,0,1,10,0)
         
-         # load mesh button  
+        # load mesh button  
         loadMeshButton = QtWidgets.QPushButton()
         loadMeshButton.setText("Load Mesh")
         loadMeshButton.clicked.connect(lambda: self.LoadMesh(col_mesh_view.text()))
         lot.addWidget(loadMeshButton,0,10,1,1,0)   
         
         # nurb mesh viewer
+        global nurb_mesh_view
         nurb_mesh_view = self.currentDirTxt = QtWidgets.QLineEdit()
         nurb_mesh_view.setStyleSheet("border: 1px groove black; border-radius: 4px;")
         nurb_mesh_view.returnPressed.connect(lambda: self.LoadNurb(nurb_mesh_view.text()))
         lot.addWidget(self.currentDirTxt,1,0,1,10,0)
         
-         # load nurb button  
+        # load nurb button  
         loadNURBButton = QtWidgets.QPushButton()
         loadNURBButton.setText("Load Nurb")
         loadNURBButton.clicked.connect(lambda: self.LoadNurb(nurb_mesh_view.text()))
@@ -234,7 +239,6 @@ class DrivenNurb(QtWidgets.QMainWindow):
             
                 global collision_mesh
                 collision_mesh = pm.ls( selection=True )[0] 
-                print "loading mesh " + str(collision_mesh)
                 
             else:
                 pm.warning('Please select a mesh instead')  
@@ -251,7 +255,6 @@ class DrivenNurb(QtWidgets.QMainWindow):
             
                 global NURB
                 NURB = pm.ls( selection=True )[0] 
-                print "load nurb " + str(NURB)
                 
             else:
                 pm.warning('Please select a nurb curve instead')    
@@ -262,7 +265,21 @@ class DrivenNurb(QtWidgets.QMainWindow):
         global NURB        
         global clusters        
         global collision_mesh   
-                    
+        
+        # try loading nurb if not loaded
+        if not NURB:
+            global nurb_mesh_view
+            if nurb_mesh_view.text() > 0:
+                self.LoadNurb(nurb_mesh_view.text())
+        
+        # try loading mesh if not loaded
+        if not collision_mesh:
+            global col_mesh_view
+            if col_mesh_view.text() > 0:
+                self.LoadMesh(col_mesh_view.text())
+        
+        
+        # if NURB and mesh loaded            
         if NURB and collision_mesh:
 
             #make mesh muscle object
@@ -289,6 +306,9 @@ class DrivenNurb(QtWidgets.QMainWindow):
                 # create joint setup
                 JNTgrp = pm.group( em = True, name = str(NURB) + '_rig_GRP' )
                 JointSetup(JNTgrp, numCVs, curveCVs)
+                
+                global windowName
+                self.CloseWindow(windowName)
             
             
  
@@ -297,4 +317,3 @@ class DrivenNurb(QtWidgets.QMainWindow):
 # ======================================================================================= # 
 win = DrivenNurb()
 win.show() 
-
