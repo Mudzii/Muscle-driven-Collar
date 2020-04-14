@@ -122,10 +122,9 @@ def JointSetup(prntGrp, nrCVs, curveCVList):
     global NURB
     
     shapes = cmds.listRelatives(str(NURB)) 
-    shape = shapes[0]
+    shape = shapes[0] 
     
-    offset = [0.0, 0.13, 0.25, 0.37, 0.5, 0.63, 0.75, 0.88]
-    
+    offset = 1.0/nrCVs
     for i in range(nrCVs):
         
         # create grp, LOC and JNT
@@ -146,7 +145,7 @@ def JointSetup(prntGrp, nrCVs, curveCVList):
         
         cmds.connectAttr(shape + ".worldSpace[0]", pocNode + ".inputCurve")
         cmds.connectAttr(pocNode + ".result.position", tempGrp + ".translate")
-        cmds.setAttr(pocNode + ".parameter", offset[i])
+        cmds.setAttr(pocNode + ".parameter", (offset * i))
 
         
 
@@ -176,7 +175,7 @@ class DrivenNurb(QtWidgets.QMainWindow):
         self.setParent(mayaMainWindow)
         self.setWindowFlags(QtCore.Qt.Window)
 
-        self.setWindowTitle('NURBDrivenCollar')
+        self.setWindowTitle('NURB collision rig')
         self.setObjectName(windowName)
         self.resize(400, 150)
 
@@ -219,7 +218,7 @@ class DrivenNurb(QtWidgets.QMainWindow):
         
         # create button  
         createButton = QtWidgets.QPushButton()
-        createButton.setText("Create collar")
+        createButton.setText("Create NURB collision rig")
         createButton.clicked.connect(lambda: self.CreateCurve())
         lot.addWidget(createButton,2,0,1,11,0) 
         
