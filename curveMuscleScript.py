@@ -176,9 +176,9 @@ class DrivenNurb(QtWidgets.QMainWindow):
         self.setParent(mayaMainWindow)
         self.setWindowFlags(QtCore.Qt.Window)
 
-        self.setWindowTitle('MuscleDrivenNurb')
+        self.setWindowTitle('NURBDrivenCollar')
         self.setObjectName(windowName)
-        self.resize(400, 200)
+        self.resize(400, 150)
 
         self.BuildUI()
         
@@ -190,37 +190,38 @@ class DrivenNurb(QtWidgets.QMainWindow):
         
         ##Layout
         lot = QtWidgets.QGridLayout()
+        
         widget.setLayout(lot)
         
         # collision mesh viewer
         col_mesh_view = self.currentDirTxt = QtWidgets.QLineEdit()
         col_mesh_view.setStyleSheet("border: 1px groove black; border-radius: 4px;")
         col_mesh_view.returnPressed.connect(lambda: self.LoadMesh(col_mesh_view.text()))
-        lot.addWidget(self.currentDirTxt,0,0,0,1)
+        lot.addWidget(self.currentDirTxt,0,0,1,10,0)
         
          # load mesh button  
         loadMeshButton = QtWidgets.QPushButton()
         loadMeshButton.setText("Load Mesh")
         loadMeshButton.clicked.connect(lambda: self.LoadMesh(col_mesh_view.text()))
-        lot.addWidget(loadMeshButton,0,1,0,9)   
+        lot.addWidget(loadMeshButton,0,10,1,1,0)   
         
         # nurb mesh viewer
         nurb_mesh_view = self.currentDirTxt = QtWidgets.QLineEdit()
         nurb_mesh_view.setStyleSheet("border: 1px groove black; border-radius: 4px;")
         nurb_mesh_view.returnPressed.connect(lambda: self.LoadNurb(nurb_mesh_view.text()))
-        lot.addWidget(self.currentDirTxt,4,0,5,1)
+        lot.addWidget(self.currentDirTxt,1,0,1,10,0)
         
          # load nurb button  
-        loadMeshButton = QtWidgets.QPushButton()
-        loadMeshButton.setText("Load Nurb")
-        loadMeshButton.clicked.connect(lambda: self.LoadNurb(nurb_mesh_view.text()))
-        lot.addWidget(loadMeshButton,4,1,5,9) 
+        loadNURBButton = QtWidgets.QPushButton()
+        loadNURBButton.setText("Load Nurb")
+        loadNURBButton.clicked.connect(lambda: self.LoadNurb(nurb_mesh_view.text()))
+        lot.addWidget(loadNURBButton,1,10,1,1,0) 
         
         # create button  
         createButton = QtWidgets.QPushButton()
-        createButton.setText("Create muscle Driven curve")
+        createButton.setText("Create collar")
         createButton.clicked.connect(lambda: self.CreateCurve())
-        lot.addWidget(createButton,8,0,1,10) 
+        lot.addWidget(createButton,2,0,1,11,0) 
         
     # ================================ #
     def LoadMesh(self, meshName):
